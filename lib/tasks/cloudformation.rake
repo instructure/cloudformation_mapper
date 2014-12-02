@@ -2,21 +2,21 @@ require 'highline/import'
 require 'aws-sdk'
 
 require 'cloudformation_mapper'
+require 'cloudformation_mapper/directory'
 
 namespace :cloudformation do
   desc 'Generate Cloudformation template'
   task :generate do
-    template = Module.new.module_eval(File.read('./Cloudformation'), './Cloudformation')
+    template = CloudformationMapper::Directory.load './'
 
-    # CloudformationRubyDSL doesn't handle JSON.pretty_generate(template) correctly
-    puts JSON.pretty_generate(JSON.parse(template.to_json))
+    puts JSON.pretty_generate(template.as_json)
   end
 
   desc 'Build CloudFormation stack'
   task :build, :stack_name do |t, args|
     stack_name = args[:stack_name] || ask("Stack name? ")
 
-    template = Module.new.module_eval(File.read('./Cloudformation'), './Cloudformation')
+    template = CloudformationMapper::Directory.load('./').new(stack_name)
 
     parameters = template.parameters.inject([]) do |result, (key, default)|
       answer = ask("#{key}? ") do |q|

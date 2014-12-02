@@ -8,10 +8,10 @@ class CloudformationMapper
   class << self
     include Enumerable
 
-    delegate :[], :keys, :each, to: :attributes
+    delegate :[], :keys, :each, to: :properties
 
-    def to_parameters
-      [self.name, @attributes]
+    def properties
+      @properties ||= {}
     end
 
     def to_ref
@@ -22,7 +22,7 @@ class CloudformationMapper
       if self.name.present?
         to_ref
       else
-        @attributes
+        @properties
       end
     end
 
@@ -37,7 +37,7 @@ class CloudformationMapper
       end
 
       if val.present?
-        attributes[key] = val
+        properties[key] = val
       else
         get_att self.name, key
       end
@@ -47,10 +47,6 @@ class CloudformationMapper
       Class.new(CloudformationMapper).tap do |item|
         item.module_exec &block
       end
-    end
-
-    def attributes
-      @attributes ||= {}
     end
   end
 end
