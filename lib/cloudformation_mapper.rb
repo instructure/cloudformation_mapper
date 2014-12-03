@@ -1,52 +1,13 @@
-require "cloudformation_mapper/version"
-
 require 'active_support/all'
 
-require 'cloudformation_mapper/cloudformation-ruby-dsl'
+require "cloudformation_mapper/version"
+require "cloudformation_mapper/template"
+require "cloudformation_mapper/mapper"
 
-class CloudformationMapper
-  class << self
-    include Enumerable
+# CloudFormation Ruby DSL https://github.com/bazaarvoice/cloudformation-ruby-dsl
+# This Gem provides some useful functionality for now, but long term should be
+# replaced with better code.
+require 'cloudformation-ruby-dsl/cfntemplate'
+require 'cloudformation-ruby-dsl/table'
 
-    delegate :[], :keys, :each, to: :properties
-
-    def properties
-      @properties ||= {}
-    end
-
-    def to_ref
-      ref self.name
-    end
-
-    def as_json *args
-      if self.name.present?
-        to_ref
-      else
-        @properties
-      end
-    end
-
-    private
-    def method_missing meth, *args, &block
-      key = meth.to_s.camelize.to_sym
-
-      if block.present?
-        val = item &block
-      else
-        val = args.length == 1 ? args[0] : args
-      end
-
-      if val.present?
-        properties[key] = val
-      else
-        get_att self.name, key
-      end
-    end
-
-    def item &block
-      Class.new(CloudformationMapper).tap do |item|
-        item.module_exec &block
-      end
-    end
-  end
-end
+module CloudformationMapper; end

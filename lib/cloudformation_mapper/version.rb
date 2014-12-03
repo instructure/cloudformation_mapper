@@ -1,3 +1,3 @@
-class CloudformationMapper
+module CloudformationMapper
   VERSION = "0.0.1"
 end

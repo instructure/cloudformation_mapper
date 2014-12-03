@@ -31,7 +31,7 @@ module CloudformationMapper::DslAttributeMethods
     define_method singular do |val|
       hash = send(name)
 
-      hash[val.name] = val.properties
+      hash[val.name] = val
     end
   end
 end

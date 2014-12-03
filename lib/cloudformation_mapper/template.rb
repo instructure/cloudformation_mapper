@@ -1,6 +1,11 @@
+require 'active_support/concern'
+
 require 'cloudformation_mapper/dsl_attribute_methods'
+require 'cloudformation_mapper/base_mapper'
 
 class CloudformationMapper::Template
+  TYPES = Hash.new(self)
+
   attr_reader :stack_name
 
   def initialize stack_name
@@ -29,17 +34,37 @@ class CloudformationMapper::Template
 
     append_mapping_hash :parameters
     append_mapping_hash :mappings
+    append_mapping_hash :conditions
     append_mapping_hash :resources
     append_mapping_hash :outputs
 
-    def as_json
+    def as_json *args
+      transform = lambda do |memo, (key, mapper)|
+        memo.merge({
+          key => mapper.attributes
+        })
+      end
+
       {
-        description: description,
-        parameters: parameters,
-        mappings: mappings,
-        resources: resources,
-        outputs: outputs
+        AWSTemplateFormatVersion: "2010-09-09",
+        Description: description,
+        Parameters: parameters.inject({}, &transform),
+        Mappings: mappings.inject({}, &transform),
+        Resources: resources.inject({}, &transform),
+        Outputs: outputs.inject({}, &transform)
       }
+    end
+    alias_method :to_hash, :as_json
+
+    def [] val
+      TYPES[val]
+    end
+
+    def mapper
+      @mapper ||= Module.new do
+        extend ActiveSupport::Concern
+        extend CloudformationMapper::BaseMapper
+      end
     end
   end
 end

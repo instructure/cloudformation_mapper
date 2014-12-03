@@ -9,18 +9,18 @@ namespace :cloudformation do
   task :generate do
     template = CloudformationMapper::Directory.load './'
 
-    puts JSON.pretty_generate(template.as_json)
+    puts JSON.pretty_generate(JSON.parse template.to_json)
   end
 
   desc 'Build CloudFormation stack'
   task :build, :stack_name do |t, args|
     stack_name = args[:stack_name] || ask("Stack name? ")
 
-    template = CloudformationMapper::Directory.load('./').new(stack_name)
+    template = CloudformationMapper::Directory.load('./')#.new(stack_name)
 
-    parameters = template.parameters.inject([]) do |result, (key, default)|
+    parameters = template.parameters.inject([]) do |result, (key, param)|
       answer = ask("#{key}? ") do |q|
-        q.default = default
+        q.default = param[:Default]#.default
       end.to_s
 
       result << {
