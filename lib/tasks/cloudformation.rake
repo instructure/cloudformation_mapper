@@ -18,17 +18,21 @@ namespace :cloudformation do
 
     template = CloudformationMapper::Directory.load('./')#.new(stack_name)
 
-    parameters = template.parameters.inject([]) do |result, (key, param)|
-      answer = ask("#{key}? ") do |q|
-        q.default = param[:Default]#.default
-      end.to_s
+    parameters = template.parameters.inject({}) do |answers, (key, param)|
+      answers[key] = if param.respond_to? :prompt
+                       param.prompt answers
+                     else
+                       ask("#{key}? ") do |q|
+                         q.default = param[:Default]#.default
+                       end.to_s
+                     end
 
+      answers
+    end.inject([]) do |result, (key, answer)|
       result << {
         parameter_key: key,
-        parameter_value: answer.to_s
+        parameter_value: answer.respond_to?(:id) ? answer.id.to_s : answer.to_s
       }
-
-      result
     end
 
     cf = Aws::CloudFormation::Resource.new

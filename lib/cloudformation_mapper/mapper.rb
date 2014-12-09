@@ -43,7 +43,8 @@ class CloudformationMapper::Mapper
     private
     def method_missing meth, *args, &block
       if allow_unknown_attributes?
-        handle_unknown_attribute meth, *args, &block
+        key = meth.to_s.camelize.to_sym
+        handle_unknown_attribute key, *args, &block
       else
         raise NameError, "Unknown property #{meth} for type #{type}"
       end
@@ -53,8 +54,8 @@ class CloudformationMapper::Mapper
       true
     end
 
-    def handle_unknown_attribute meth, *args, &block
-      key = meth.to_s.camelize.to_sym
+    def handle_unknown_attribute key, *args, &block
+      key = key.to_sym
 
       if block.present?
         val = item *args, &block
