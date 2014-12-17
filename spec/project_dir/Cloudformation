@@ -1,0 +1,34 @@
+#!/usr/local/env ruby
+
+$LOAD_PATH << File.join(File.dirname(__FILE__), 'lib')
+Dir[File.join(File.dirname(__FILE__), "lib", "cloudformation", "*.rb")].sort.each{|f| load f}
+
+name 'ExampleCloudformationMapper'
+description 'Example Cloudformation configuration using Cloudformation Mapper'
+
+parameter KeyName
+parameter DBUserName
+parameter DBPassword
+parameter SecretKeyBase
+parameter InstanceType
+parameter VpcId
+parameter VpcSubnets
+parameter VpcElbSubnets
+parameter VpcSecurityGroup
+parameter CacheSubnetGroup
+parameter DBSubnetGroup
+parameter WebSSLCertificateArn
+
+resource User
+resource UserAccessKey
+resource SecurityGroup
+resource SecurityGroupIngress
+resource ElasticBeanstalk
+resource ElasticBeanstalkRole
+resource ElasticBeanstalkInstanceProfile
+resource ElasticBeanstalkConfig
+resource ElasticBeanstalkEnvironment
+resource Policy
+resource SQL
+resource Memcache
+resource S3Bucket

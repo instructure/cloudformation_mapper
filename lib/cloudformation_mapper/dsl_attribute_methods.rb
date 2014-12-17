@@ -1,5 +1,7 @@
 require 'active_support/inflector'
 
+require 'cloudformation_mapper'
+
 module CloudformationMapper::DslAttributeMethods
   private
   module NoVal; end
@@ -24,8 +26,6 @@ module CloudformationMapper::DslAttributeMethods
   end
 
   def append_mapping_hash name, singular = name.to_s.singularize.to_sym
-    var = "@#{attr}".to_sym
-
     getter_setter name, {}
 
     define_method singular do |val|

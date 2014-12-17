@@ -1,3 +1,4 @@
+require 'cloudformation_mapper'
 require 'cloudformation_mapper/template'
 
 class CloudformationMapper::Mapper
@@ -14,12 +15,24 @@ class CloudformationMapper::Mapper
   end
 
   class << self
-    def type val
-      if (template = CloudformationMapper::Template[val]).present?
-        include template.mapper
+    def name val = nil
+      if val.present?
+        @name = val
+      else
+        @name || super()
       end
+    end
 
-      super
+    def type val = :NOT_PASSED
+      if val == :NOT_PASSED
+        attributes[:Type]
+      else
+        if (template = CloudformationMapper::Template[val]).present?
+          include template.mapper
+        end
+
+        attributes[:Type] = val
+      end
     end
 
     delegate :[], :[]=, :has_key?, :each, to: :attributes
@@ -58,7 +71,7 @@ class CloudformationMapper::Mapper
       key = key.to_sym
 
       if block.present?
-        val = item *args, &block
+        val = item(*args, &block)
       else
         val = args.length == 1 ? args[0] : args
       end
@@ -74,7 +87,7 @@ class CloudformationMapper::Mapper
 
     def item *args, &block
       Class.new(CloudformationMapper::Mapper) do
-        module_exec *args, &block
+        module_exec(*args, &block)
       end
     end
   end

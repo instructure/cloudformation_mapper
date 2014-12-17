@@ -1,3 +1,4 @@
+require 'cloudformation_mapper'
 require 'cloudformation_mapper/file'
 
 module CloudformationMapper::Directory
