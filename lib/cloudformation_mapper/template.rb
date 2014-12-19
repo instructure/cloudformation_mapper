@@ -14,30 +14,32 @@ class CloudformationMapper::Template
   end
 
   class << self
-    extend CloudformationMapper::DslAttributeMethods
+    include CloudformationMapper::DslAttributeMethods
 
     attr_reader :type
+    attr_reader :force_type
 
     class DuplicateTypeError < StandardError; end
-    def register_type type
+    def register_type type, params = {}
       # FIXME: thread safety?
-      if CloudformationMapper::Template::TYPES.defined? type
+      if CloudformationMapper::Template::TYPES.key? type
         raise DuplicateTypeError, "Duplicate type #{type}"
       end
 
       CloudformationMapper::Template::TYPES[type] = self
 
       @type = type
+      @force_type = params[:force_type] || type
     end
 
-    getter_setter :name
-    getter_setter :description
+    get_set_value :Name
+    get_set_value :Description
 
-    append_mapping_hash :parameters
-    append_mapping_hash :mappings
-    append_mapping_hash :conditions
-    append_mapping_hash :resources
-    append_mapping_hash :outputs
+    append_mapping_hash :Parameters, 'CloudformationMapper::Parameter'
+    append_mapping_hash :Mappings, 'CloudformationMapper::Mapper'
+    append_mapping_hash :Conditions, 'CloudformationMapper::Mapper'
+    append_mapping_hash :Resources, 'CloudformationMapper::Mapper'
+    append_mapping_hash :Outputs, 'CloudformationMapper::Mapper'
 
     def as_json *args
       transform = lambda do |memo, (key, mapper)|
@@ -62,10 +64,38 @@ class CloudformationMapper::Template
     end
 
     def mapper
-      @mapper ||= Module.new do
+      return @mapper if defined? @mapper
+
+      @mapper = Module.new do
         extend ActiveSupport::Concern
-        extend CloudformationMapper::BaseMapper
+        include CloudformationMapper::BaseMapper
+
+        const_set(:ClassMethods, Module.new do
+          include CloudformationMapper::DslAttributeMethods
+        end)
       end
+
+      @mapper::ClassMethods.module_exec self do |source_template|
+        define_method :template do
+          source_template
+        end
+      end
+
+      parameters.each do |key, parameter|
+        parameter.define_dsl_accessors_on @mapper::ClassMethods
+      end
+
+      outputs.each do |key, output|
+        output.define_ref_reader_on @mapper::ClassMethods
+      end
+
+      if defined? super
+        @mapper.extend super
+      end
+
+      return @mapper
     end
   end
 end
+
+require 'cloudformation_mapper/parameter'

@@ -1,6 +1,5 @@
 class SecurityGroup < CloudformationMapper::Mapper
   type 'AWS::EC2::SecurityGroup'
-
   properties do
     group_description 'Security group'
     vpc_id VpcId

@@ -3,31 +3,9 @@ require 'cloudformation/vpc'
 require 'cloudformation/security_group'
 
 class CacheSubnetGroup < CloudformationMapper::Mapper
-  type 'String'
+  type 'AWS::ElastiCache::SubnetGroup::Name'
   description 'ElastiCache Subnet Group to launch Memcache into'
-
-  def self.prompt sofar
-    prompt = "Select Cache Subnet Group? "
-
-    subnet_groups = Aws::ElastiCache::Client.new.describe_cache_subnet_groups.cache_subnet_groups
-
-    choose do |menu|
-      menu.index        = :letter
-      menu.index_suffix = ") "
-
-      menu.header = prompt
-
-      subnet_groups.each do |sg|
-        if sofar['VpcId'].present? && sofar['VpcId'].id != sg.vpc_id
-          next
-        end
-
-        menu.choice "#{sg.cache_subnet_group_name} (#{sg.vpc_id}) - #{sg.cache_subnet_group_description}" do
-          sg.cache_subnet_group_name
-        end
-      end
-    end
-  end
+  vpc_id VpcId
 end
 
 class Memcache < CloudformationMapper::Mapper

@@ -26,23 +26,17 @@ RSpec.describe CloudformationMapper::Mapper do
 
         context 'with a block' do
           let(:result) do
-            subject.any_attribute arg_1, arg_2 do |*args|
-              @args = args
-              class << self
-                def assert_result
-                  [true] + @args
-                end
-              end
+            subject.any_attribute do
+              test_attr true
             end
           end
 
           it 'should execute the block within the context of a new CloudformationMapper::Mapper Class' do
-            expect(result).to respond_to(:assert_result)
             expect(result.ancestors).to include(CloudformationMapper::Mapper)
           end
 
-          it 'should pass along any arguments' do
-            expect(result.assert_result).to contain_exactly(true, arg_1, arg_2)
+          it 'should set attributes' do
+            expect(result.test_attr).to be(true)
           end
 
           it 'should store the resulting CloudformationMapper::Mapper Class as the attribute\'s value' do

@@ -1,5 +1,8 @@
+require 'active_support/inflector'
+
 require 'cloudformation_mapper'
-require 'cloudformation_mapper/template'
+
+require 'cloudformation_mapper/parameter/all'
 
 class CloudformationMapper::Mapper
   def initialize id
@@ -15,6 +18,8 @@ class CloudformationMapper::Mapper
   end
 
   class << self
+    include CloudformationMapper::DslAttributeMethods
+
     def name val = nil
       if val.present?
         @name = val
@@ -31,13 +36,8 @@ class CloudformationMapper::Mapper
           include template.mapper
         end
 
-        attributes[:Type] = val
+        attributes[:Type] = template.force_type || val
       end
-    end
-
-    delegate :[], :[]=, :has_key?, :each, to: :attributes
-    def attributes
-      @attributes ||= {}
     end
 
     def to_ref
@@ -71,7 +71,7 @@ class CloudformationMapper::Mapper
       key = key.to_sym
 
       if block.present?
-        val = item(*args, &block)
+        val = item((args.first || CloudformationMapper::Mapper), &block)
       else
         val = args.length == 1 ? args[0] : args
       end
@@ -85,10 +85,8 @@ class CloudformationMapper::Mapper
       end
     end
 
-    def item *args, &block
-      Class.new(CloudformationMapper::Mapper) do
-        module_exec(*args, &block)
-      end
+    def default_mapper
+      self
     end
   end
 end

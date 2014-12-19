@@ -1,5 +1,4 @@
 require 'cloudformation_mapper'
-require 'cloudformation_mapper/template'
 
 module CloudformationMapper::File
   def self.load file

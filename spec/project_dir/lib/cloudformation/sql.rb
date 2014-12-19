@@ -17,31 +17,9 @@ class DBPassword < CloudformationMapper::Mapper
 end
 
 class DBSubnetGroup < CloudformationMapper::Mapper
-  type 'String'
-  description 'RDS Subnet Group to launch Memcache into'
-
-  def self.prompt sofar
-    prompt = "Select RDS Subnet Group? "
-
-    subnet_groups = Aws::RDS::Client.new.describe_db_subnet_groups.db_subnet_groups
-
-    choose do |menu|
-      menu.index        = :letter
-      menu.index_suffix = ") "
-
-      menu.header = prompt
-
-      subnet_groups.each do |sg|
-        if sofar['VpcId'].present? && sofar['VpcId'].id != sg.vpc_id
-          next
-        end
-
-        menu.choice "#{sg.db_subnet_group_name} (#{sg.vpc_id}) - #{sg.db_subnet_group_description}" do
-          sg.db_subnet_group_name
-        end
-      end
-    end
-  end
+  type 'AWS::RDS::DBSubnetGroup::Name'
+  description 'RDS Subnet Group to launch PostgreSQL into'
+  vpc_id VpcId
 end
 
 class SQL < CloudformationMapper::Mapper
@@ -52,12 +30,7 @@ class SQL < CloudformationMapper::Mapper
     engine 'postgres'
     master_username DBUserName
     master_user_password DBPassword
-
-    def self.vpc_security_groups *args
-      handle_unknown_attribute 'VPCSecurityGroups', *args
-    end
-    vpc_security_groups [SecurityGroup]
-
+    vpc_security_group SecurityGroup
     db_subnet_group_name DBSubnetGroup
   end
   deletion_policy 'Snapshot'

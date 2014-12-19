@@ -19,14 +19,7 @@ namespace :cloudformation do
     template = CloudformationMapper::Directory.load('./')#.new(stack_name)
 
     parameters = template.parameters.inject({}) do |answers, (key, param)|
-      answers[key] = if param.respond_to? :prompt
-                       param.prompt answers
-                     else
-                       ask("#{key}? ") do |q|
-                         q.default = param[:Default]#.default
-                       end.to_s
-                     end
-
+      answers[key] = param.prompt answers
       answers
     end.inject([]) do |result, (key, answer)|
       result << {
