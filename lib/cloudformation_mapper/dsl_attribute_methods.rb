@@ -1,5 +1,6 @@
 require 'active_support/concern'
 require 'active_support/inflector'
+require 'active_support/core_ext/object/duplicable'
 
 require 'cloudformation_mapper'
 
@@ -39,7 +40,7 @@ module CloudformationMapper::DslAttributeMethods
     end
 
     # Value attributes
-    def get_set_value key, method = key.to_s.underscore.to_sym, default = nil 
+    def get_set_value key, method = key.to_s.underscore.to_sym, default_val = nil
       define_method method do |val = NoVal, &block|
         if val == NoVal
           val = block.call if block.present?
@@ -51,8 +52,10 @@ module CloudformationMapper::DslAttributeMethods
 
         if attributes.key? key
           attributes[key]
+        elsif not default_val.nil?
+          attributes[key] = default_val.duplicable? ? default_val.clone : default_val
         else
-          attributes[key] = default.clone
+          default_val
         end
       end
 
@@ -82,7 +85,7 @@ module CloudformationMapper::DslAttributeMethods
     end
 
     # Mapper attributes
-    def get_set_mapping key, mapper_class = default_mapper, method = key.to_s.underscore.to_sym, default = nil, &block
+    def get_set_mapping key, mapper_class = default_mapper, method = key.to_s.underscore.to_sym, default_val = nil, &block
       if defined? yield
         yield mapper_class = item(mapper_class)
       end
@@ -93,13 +96,19 @@ module CloudformationMapper::DslAttributeMethods
         end
 
         if val.present?
-          attributes[key] = val
+          if attributes.key? val.name
+            attributes[key] = attributes[key].merge val
+          else
+            attributes[key] = val
+          end
         end
 
         if attributes.key? key
           attributes[key]
+        elsif not default_val.nil?
+          attributes[key] = default_val.duplicable? ? default_val.clone : default_val
         else
-          attributes[key] = default.clone
+          default_val
         end
       end
 
@@ -139,7 +148,7 @@ module CloudformationMapper::DslAttributeMethods
         memo = send(method)
 
         # If a block is passed, it is evaluated in the context of a new mapper
-        # class. val is the class to inherit from, defaulting to mapper_class
+        # class. val becomes the class to inherit from, defaulting to mapper_class
         # if not passed.
         if block.present?
           val = item(( val || mapper_class), &block)

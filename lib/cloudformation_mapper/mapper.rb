@@ -40,7 +40,7 @@ class CloudformationMapper::Mapper
       CloudformationMapper::Mapper::TYPES[type] = self
 
       @template_type = type
-      @force_type = params[:force_type] || type
+      @force_type = params[:force] || type
     end
 
     def type val = :NOT_PASSED

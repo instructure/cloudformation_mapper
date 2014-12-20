@@ -17,7 +17,7 @@ module CloudformationMapper::Parameter::SecurityGroupIdMapper
       vpc = sofar[vpc_id.name] || Aws::EC2::Client.new.describe_security_groups
       security_groups = vpc.security_groups
 
-      choose do |menu|
+      HighLine.choose do |menu|
         menu.index        = :letter
         menu.index_suffix = ") "
 

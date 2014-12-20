@@ -16,7 +16,7 @@ module CloudformationMapper::Parameter::CacheSubnetGroupNameMapper
     def prompt sofar
       subnet_groups = Aws::ElastiCache::Client.new.describe_cache_subnet_groups.cache_subnet_groups
 
-      choose do |menu|
+      HighLine.choose do |menu|
         menu.index        = :letter
         menu.index_suffix = ") "
 

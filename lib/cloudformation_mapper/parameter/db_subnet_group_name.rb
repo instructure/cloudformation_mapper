@@ -16,7 +16,7 @@ module CloudformationMapper::Parameter::DBSubnetGroupNameMapper
     def prompt sofar
       subnet_groups = Aws::RDS::Client.new.describe_db_subnet_groups.db_subnet_groups
 
-      choose do |menu|
+      HighLine.choose do |menu|
         menu.index        = :letter
         menu.index_suffix = ") "
 
@@ -37,7 +37,7 @@ module CloudformationMapper::Parameter::DBSubnetGroupNameMapper
 end
 
 class CloudformationMapper::Parameter::DBSubnetGroupName < CloudformationMapper::Parameter::String
-  register_type 'AWS::ElastiDB::SubnetGroup::Name', force: 'String'
+  register_type 'AWS::RDS::DBSubnetGroup::Name', force: 'String'
 
   def self.mapper
     CloudformationMapper::Parameter::DBSubnetGroupNameMapper.include super

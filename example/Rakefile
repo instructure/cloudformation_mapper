@@ -1,0 +1,6 @@
+require 'bundler/setup'
+
+require 'byebug'
+
+$LOAD_PATH.unshift File.expand_path('./lib')
+Dir["#{File.dirname(__FILE__)}/lib/tasks/*.rake"].sort.each{|f| load f}

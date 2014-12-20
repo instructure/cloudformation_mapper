@@ -8,8 +8,8 @@ module CloudformationMapper::Parameter::StringMapper
   extend ActiveSupport::Concern
 
   module ClassMethods
-    def prompt
-      @value = ask("#{key}? ") do |q|
+    def prompt sofar
+      @value = HighLine.ask("#{name} - #{description}? ") do |q|
         q.default = self.default
       end.to_s
     end

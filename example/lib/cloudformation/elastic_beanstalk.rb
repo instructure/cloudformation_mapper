@@ -89,8 +89,8 @@ class ElasticBeanstalkConfig < CloudformationMapper::Mapper
       end,
       item do
         namespace 'aws:elasticbeanstalk:application:environment'
-        option_name 'WEB_URL'
-        value get_att('WebBucket', 'WebsiteURL')
+        option_name 'S3_DOMAIN'
+        value get_att('S3Bucket', 'DomainName')
       end,
       item do
         namespace 'aws:elasticbeanstalk:application:environment'

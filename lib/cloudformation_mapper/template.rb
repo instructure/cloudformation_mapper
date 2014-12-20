@@ -71,7 +71,7 @@ module CloudformationMapper::TemplateMapper
     end
 
     def define_dsl_accessors_on mod
-      mod.append_mapping_hash name do |mapper|
+      mod.get_set_mapping name do |mapper|
         parameters.each do |key, parameter|
           parameter.define_dsl_accessors_on mapper.singleton_class
         end

@@ -12,7 +12,7 @@ module CloudformationMapper::Parameter::VpcIdMapper
     def prompt sofar
       vpcs = Aws::EC2::Resource.new.vpcs
 
-      choose do |menu|
+      HighLine.choose do |menu|
         menu.index        = :letter
         menu.index_suffix = ") "
 

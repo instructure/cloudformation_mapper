@@ -46,32 +46,29 @@ RSpec.describe CloudformationMapper::Directory do
               "Default": "m1.small"
             },
             "VpcId": {
-              "Type": "AWS::EC2::VPC::Id",
+              "Type": "String",
               "Description": "The id of the VPC to launch into."
             },
             "VpcSubnets": {
-              "Type": "List<AWS::EC2::Subnet::Id>",
+              "Type": "CommaDelimitedList",
               "Description": "The list of VPC Public subnets to launch resources into."
             },
             "VpcElbSubnets": {
-              "Type": "List<AWS::EC2::Subnet::Id>",
+              "Type": "CommaDelimitedList",
               "Description": "The list of VPC Private subnets to launch ELBs into."
             },
             "VpcSecurityGroup": {
-              "Type": "AWS::EC2::SecurityGroup::Id",
+              "Type": "String",
               "Description": "VPC wide security group.",
               "Default": "default"
             },
             "CacheSubnetGroup": {
-              "Type": "AWS::ElastiCache::SubnetGroup::Name",
+              "Type": "String",
               "Description": "ElastiCache Subnet Group to launch Memcache into"
             },
             "DBSubnetGroup": {
-              "Type": "AWS::RDS::DBSubnetGroup::Name",
-              "Description": "RDS Subnet Group to launch PostgreSQL into",
-              "VpcId": {
-                "Ref": "VpcId"
-              }
+              "Type": "String",
+              "Description": "RDS Subnet Group to launch PostgreSQL into"
             },
             "WebSSLCertificateArn": {
               "Type": "String",
@@ -211,11 +208,11 @@ RSpec.describe CloudformationMapper::Directory do
                   },
                   {
                     "Namespace": "aws:elasticbeanstalk:application:environment",
-                    "OptionName": "WEB_URL",
+                    "OptionName": "S3_DOMAIN",
                     "Value": {
                       "Fn::GetAtt": [
-                        "WebBucket",
-                        "WebsiteURL"
+                        "S3Bucket",
+                        "DomainName"
                       ]
                     }
                   },
@@ -454,9 +451,11 @@ RSpec.describe CloudformationMapper::Directory do
                 "MasterUserPassword": {
                   "Ref": "DBPassword"
                 },
-                "VpcSecurityGroup": {
-                  "Ref": "SecurityGroup"
-                },
+                "VPCSecurityGroups": [
+                  {
+                    "Ref": "SecurityGroup"
+                  }
+                ],
                 "DbSubnetGroupName": {
                   "Ref": "DBSubnetGroup"
                 }
