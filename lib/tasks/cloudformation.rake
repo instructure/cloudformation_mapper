@@ -9,7 +9,7 @@ namespace :cloudformation do
   task :generate do
     template = CloudformationMapper::Directory.load './'
 
-    puts JSON.pretty_generate(JSON.parse template.to_json)
+    puts JSON.pretty_generate(JSON.parse template.to_cloudformation)
   end
 
   desc 'Build CloudFormation stack'
@@ -32,7 +32,7 @@ namespace :cloudformation do
 
     stack = cf.create_stack(
       stack_name: stack_name,
-      template_body: template.to_json,
+      template_body: template.to_cloudformation,
       parameters: parameters,
       capabilities: ['CAPABILITY_IAM']
     )

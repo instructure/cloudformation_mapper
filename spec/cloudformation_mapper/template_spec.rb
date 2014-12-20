@@ -2,7 +2,11 @@ require 'cloudformation_mapper/template'
 
 RSpec.describe CloudformationMapper::Template do
   context 'class' do
-    subject{Class.new CloudformationMapper::Template}
+    subject do
+      Class.new CloudformationMapper::Mapper do
+        type 'Template'
+      end
+    end
 
     # Template attributes
     it {should respond_to(:name)}

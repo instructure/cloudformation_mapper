@@ -3,6 +3,8 @@
 $LOAD_PATH << File.join(File.dirname(__FILE__), 'lib')
 Dir[File.join(File.dirname(__FILE__), "lib", "cloudformation", "*.rb")].sort.each{|f| load f}
 
+type CloudformationMapper::Template
+
 name 'ExampleCloudformationMapper'
 description 'Example Cloudformation configuration using Cloudformation Mapper'
 

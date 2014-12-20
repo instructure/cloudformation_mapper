@@ -28,7 +28,9 @@ module CloudformationMapper::ParameterMapper
   end
 end
 
-class CloudformationMapper::Parameter < CloudformationMapper::Template
+class CloudformationMapper::Parameter < CloudformationMapper::Mapper
+  type CloudformationMapper::Template
+
   def self.mapper
     CloudformationMapper::ParameterMapper.include super
   end

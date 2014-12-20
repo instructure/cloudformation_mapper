@@ -11,3 +11,6 @@ module CloudformationMapper
   autoload :Template, "cloudformation_mapper/template"
   autoload :Mapper,  "cloudformation_mapper/mapper"
 end
+
+require 'cloudformation_mapper/parameter/all'
+require 'cloudformation_mapper/resource/all'

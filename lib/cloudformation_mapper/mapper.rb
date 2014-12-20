@@ -2,9 +2,9 @@ require 'active_support/inflector'
 
 require 'cloudformation_mapper'
 
-require 'cloudformation_mapper/parameter/all'
-
 class CloudformationMapper::Mapper
+  TYPES = {}
+
   def initialize id
     @id = id
   end
@@ -28,15 +28,35 @@ class CloudformationMapper::Mapper
       end
     end
 
-    def type val = :NOT_PASSED
-      if val == :NOT_PASSED
-        attributes[:Type]
-      else
-        if (template = CloudformationMapper::Template[val]).present?
-          include template.mapper
-        end
+    attr_reader :template_type
+    attr_reader :force_type
 
+    class DuplicateTypeError < StandardError; end
+    def register_type type, params = {}
+      if CloudformationMapper::Mapper::TYPES.key? type
+        raise DuplicateTypeError, "Duplicate type #{type}"
+      end
+
+      CloudformationMapper::Mapper::TYPES[type] = self
+
+      @template_type = type
+      @force_type = params[:force_type] || type
+    end
+
+    def type val = :NOT_PASSED
+      return attributes[:Type] if val == :NOT_PASSED
+
+      if val.respond_to? :mapper
+        template = val
+      else
+        template = CloudformationMapper::Mapper::TYPES[val]
+      end
+
+      if template.present?
+        include template.mapper
         attributes[:Type] = template.force_type || val
+      else
+        attributes[:Type] = val
       end
     end
 
