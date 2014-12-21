@@ -8,12 +8,12 @@ require 'cloudformation/memcache'
 
 class KeyName < CloudformationMapper::Mapper
   type 'String'
-  description 'The name of the SSH key to use.'
+  description 'The name of the SSH key to use'
 end
 
 class InstanceType < CloudformationMapper::Mapper
   type 'String'
-  description 'The instance type to use for servers.'
+  description 'The instance type to use for servers'
   default 'm1.small'
 end
 

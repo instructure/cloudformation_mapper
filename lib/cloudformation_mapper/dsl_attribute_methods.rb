@@ -7,9 +7,13 @@ require 'cloudformation_mapper'
 module CloudformationMapper::DslAttributeMethods
   extend ActiveSupport::Concern
 
-  delegate :[], :[]=, :has_key?, :each, to: :attributes
+  delegate :[], :[]=, :keys, :has_key?, :each, to: :attributes
   def attributes
-    @attributes ||= defined?(super) ? super.clone : {}
+    @attributes ||= if ancestors[1].respond_to? :attributes
+                      ancestors[1].attributes.clone
+                    else
+                      {}
+                    end
   end
 
   def item mapper_class = default_mapper, &block
@@ -24,9 +28,27 @@ module CloudformationMapper::DslAttributeMethods
     CloudformationMapper::Mapper
   end
 
-  module ClassMethods
-    module NoVal; end
+  def merge other
+    clone.merge! other
+  end
 
+  def merge! other
+    (self.keys & other.keys).each do |key|
+      if self[key].respond_to? :merge
+        self[key] = self[key].merge other[key]
+      else
+        self[key] = other[key].duplicable? ? other[key].clone : other[key]
+      end
+    end
+
+    (other.keys - self.keys).each do |key|
+      self[key] = other[key].duplicable? ? other[key].clone : other[key]
+    end
+
+    return self
+  end
+
+  module ClassMethods
     def item mapper_class = default_mapper, &block
       mapper_class = mapper_class.constantize if mapper_class.respond_to? :constantize
 
@@ -40,13 +62,19 @@ module CloudformationMapper::DslAttributeMethods
     end
 
     # Value attributes
-    def get_set_value key, method = key.to_s.underscore.to_sym, default_val = nil
-      define_method method do |val = NoVal, &block|
-        if val == NoVal
-          val = block.call if block.present?
+    def get_set_value key, method = key.to_s.underscore.to_sym, default_val = nil, &block_handler
+      block_handler ||= lambda do |source_mapper, val = nil, &block|
+        if block.present?
+          val = block.call
+        else
+          val
         end
+      end
 
-        unless val == NoVal
+      define_method method do |val = nil, &block|
+        val = block_handler.call self, val, &block
+
+        unless val.nil?
           attributes[key] = val
         end
 
@@ -73,14 +101,14 @@ module CloudformationMapper::DslAttributeMethods
     def append_value key, method, singular, initial_memo
       get_set_value key, method, initial_memo
 
-      define_method singular do |val = NoVal, &block|
+      define_method singular do |val = nil, &block|
         memo = send(method)
 
         if block.present?
           val = block.call if block.present?
         end
 
-        yield memo, val unless val == NoVal
+        yield memo, val unless val.nil?
       end
     end
 
@@ -90,30 +118,20 @@ module CloudformationMapper::DslAttributeMethods
         yield mapper_class = item(mapper_class)
       end
 
-      define_method method do |val = nil, &block|
+      get_set_value key, method, default_val do |source_mapper, val = nil, &block|
         if block.present?
-          val = item(( val || mapper_class), &block)
-        end
+          mapper = if !val.nil?
+                     val
+                   elsif source_mapper[key].present?
+                     source_mapper[key]
+                   else
+                     mapper_class
+                   end
 
-        if val.present?
-          if attributes.key? val.name
-            attributes[key] = attributes[key].merge val
-          else
-            attributes[key] = val
-          end
-        end
-
-        if attributes.key? key
-          attributes[key]
-        elsif not default_val.nil?
-          attributes[key] = default_val.duplicable? ? default_val.clone : default_val
+          val = item(mapper, &block)
         else
-          default_val
+          val
         end
-      end
-
-      define_method "#{method}=" do |val|
-        attributes[key] = val
       end
     end
 
@@ -156,26 +174,6 @@ module CloudformationMapper::DslAttributeMethods
 
         accumulator.call memo, val if val.present?
       end
-    end
-
-    def merge other
-      clone.merge! other
-    end
-
-    def merge! other
-      (attributes.keys & other.keys).each do |key|
-        if attributes[key].respond_to? :merge
-          attributes[key] = attributes[key].merge other[key]
-        else
-          attributes[key] = other[key]
-        end
-      end
-
-      (other.keys - attributes.keys).each do |key|
-        attributes[key] = other[key]
-      end
-
-      return self
     end
   end
 end

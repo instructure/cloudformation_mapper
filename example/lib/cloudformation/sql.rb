@@ -4,14 +4,14 @@ require 'cloudformation/security_group'
 
 class DBUserName < CloudformationMapper::Mapper
   type 'String'
-  description 'Database user name.'
+  description 'Database user name'
   default 'db_user'
   min_length 1
 end
 
 class DBPassword < CloudformationMapper::Mapper
   type 'String'
-  description 'Database password, at least 8 characters.'
+  description 'Database password, at least 8 characters'
   no_echo true
   min_length 8
 end

@@ -20,17 +20,17 @@ RSpec.describe CloudformationMapper::Directory do
           "Parameters": {
             "KeyName": {
               "Type": "String",
-              "Description": "The name of the SSH key to use."
+              "Description": "The name of the SSH key to use"
             },
             "DBUserName": {
               "Type": "String",
-              "Description": "Database user name.",
+              "Description": "Database user name",
               "Default": "db_user",
               "MinLength": 1
             },
             "DBPassword": {
               "Type": "String",
-              "Description": "Database password, at least 8 characters.",
+              "Description": "Database password, at least 8 characters",
               "NoEcho": true,
               "MinLength": 8
             },
@@ -42,24 +42,24 @@ RSpec.describe CloudformationMapper::Directory do
             },
             "InstanceType": {
               "Type": "String",
-              "Description": "The instance type to use for servers.",
+              "Description": "The instance type to use for servers",
               "Default": "m1.small"
             },
             "VpcId": {
               "Type": "String",
-              "Description": "The id of the VPC to launch into."
+              "Description": "The id of the VPC to launch into"
             },
             "VpcSubnets": {
               "Type": "CommaDelimitedList",
-              "Description": "The list of VPC Public subnets to launch resources into."
+              "Description": "The list of VPC Private subnets to launch resources into"
             },
             "VpcElbSubnets": {
               "Type": "CommaDelimitedList",
-              "Description": "The list of VPC Private subnets to launch ELBs into."
+              "Description": "The list of VPC Public subnets to launch ELBs into"
             },
             "VpcSecurityGroup": {
               "Type": "String",
-              "Description": "VPC wide security group.",
+              "Description": "VPC wide security group",
               "Default": "default"
             },
             "CacheSubnetGroup": {
@@ -72,7 +72,7 @@ RSpec.describe CloudformationMapper::Directory do
             },
             "WebSSLCertificateArn": {
               "Type": "String",
-              "Description": "ARN for the SSL certificate to use with the Web component."
+              "Description": "ARN for the SSL certificate to use with the Web component"
             }
           },
           "Mappings": {

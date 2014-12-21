@@ -91,9 +91,9 @@ class CloudformationMapper::Mapper
       key = key.to_sym
 
       if block.present?
-        val = item((args.first || CloudformationMapper::Mapper), &block)
+        val = item((args.first || default_mapper), &block)
       else
-        val = args.length == 1 ? args[0] : args
+        val = handle_unknown_attribute_args key, *args
       end
 
       if val.present?
@@ -105,8 +105,8 @@ class CloudformationMapper::Mapper
       end
     end
 
-    def default_mapper
-      self
+    def handle_unknown_attribute_args key, *args
+      args.length == 1 ? args[0] : args
     end
   end
 end

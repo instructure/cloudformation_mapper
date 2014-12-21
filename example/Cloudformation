@@ -1,7 +1,7 @@
 #!/usr/local/env ruby
 
 $LOAD_PATH << File.join(File.dirname(__FILE__), 'lib')
-Dir[File.join(File.dirname(__FILE__), "lib", "cloudformation", "*.rb")].sort.each{|f| load f}
+Dir[File.join(File.dirname(__FILE__), "lib", "cloudformation", "*.rb")].sort.each{|f| require f}
 
 type CloudformationMapper::Template
 
