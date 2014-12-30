@@ -43,8 +43,8 @@ class CloudformationMapper::Mapper
       @force_type = params[:force] || type
     end
 
-    def type val = :NOT_PASSED
-      return attributes[:Type] if val == :NOT_PASSED
+    def type val = nil
+      return attributes[:Type] if val.nil?
 
       if val.respond_to? :mapper
         template = val

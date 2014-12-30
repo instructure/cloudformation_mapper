@@ -32,6 +32,6 @@ class CloudformationMapper::Parameter < CloudformationMapper::Mapper
   type CloudformationMapper::Template
 
   def self.mapper
-    CloudformationMapper::ParameterMapper.include super
+    @mapper ||= CloudformationMapper::ParameterMapper.include super
   end
 end

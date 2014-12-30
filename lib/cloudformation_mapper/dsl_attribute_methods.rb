@@ -20,7 +20,11 @@ module CloudformationMapper::DslAttributeMethods
     mapper_class = mapper_class.constantize if mapper_class.respond_to? :constantize
 
     Class.new(mapper_class) do
-      instance_eval &block if block.present?
+      if block.arity == 0
+        instance_eval &block
+      else
+        block.call self
+      end if block.present?
     end
   end
 
@@ -53,7 +57,11 @@ module CloudformationMapper::DslAttributeMethods
       mapper_class = mapper_class.constantize if mapper_class.respond_to? :constantize
 
       Class.new(mapper_class) do
-        instance_eval &block if block.present?
+        if block.arity == 0
+          instance_eval &block
+        else
+          block.call self
+        end if block.present?
       end
     end
 
