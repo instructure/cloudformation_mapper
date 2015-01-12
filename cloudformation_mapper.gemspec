@@ -6,11 +6,10 @@ require 'cloudformation_mapper/version'
 Gem::Specification.new do |spec|
   spec.name          = "cloudformation_mapper"
   spec.version       = CloudformationMapper::VERSION
-  spec.authors       = ["Brian Finney"]
-  spec.email         = ["bri@nfinney.com"]
+  spec.authors       = ["Instructure"]
   spec.summary       = %q{OO mapping for cloudformation}
   spec.description   = %q{OO mapping for cloudformation}
-  spec.homepage      = ""
+  spec.homepage      = %q{http://github.com/instructure/cloudformation_mapper}
   spec.license       = "MIT"
 
   spec.files         = `git ls-files -z`.split("\x0")
