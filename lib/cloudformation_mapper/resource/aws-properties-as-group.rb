@@ -1,6 +1,6 @@
 require 'cloudformation_mapper/resource'
 
-class CloudformationMapper::Resource::CloudformationMapper::Resource::Aws-properties-as-group < CloudformationMapper::Resource
+class CloudformationMapper::Resource::AwsPropertiesAsGroup < CloudformationMapper::Resource
   register_type 'AWS::AutoScaling::AutoScalingGroup'
 
   type 'Template'
@@ -10,11 +10,6 @@ class CloudformationMapper::Resource::CloudformationMapper::Resource::Aws-proper
     type 'Template'
     name :Properties
 
-
-    parameter do
-      type 'CommaDelimitedList'
-      name :VPCSecurityGroups
-    end
 
     parameter do
       type 'List<String>'
@@ -62,7 +57,7 @@ class CloudformationMapper::Resource::CloudformationMapper::Resource::Aws-proper
     end
 
     parameter do
-      type 'List<AutoScalingMetricsCollection>'
+      type 'List<Auto Scaling MetricsCollection>'
       name :MetricsCollection
     end
 
@@ -82,7 +77,7 @@ class CloudformationMapper::Resource::CloudformationMapper::Resource::Aws-proper
     end
 
     parameter do
-      type 'List<AutoScalingTags>'
+      type 'List<Auto Scaling Tag>'
       name :Tags
     end
 

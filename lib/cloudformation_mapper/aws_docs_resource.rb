@@ -8,12 +8,16 @@ require 'cloudformation_mapper'
 class CloudformationMapper::AwsDocsResource < CloudformationMapper::Resource
   class Parameter < CloudformationMapper::Mapper
     class << self
+      get_set_value :Description
       get_set_value :Required
       def required_with_translate_html val = nil
-        required_without_translate_html case val.present? ? val.text : val
+        required_without_translate_html case val.present? ? val.text : nil
         when /Yes/
           true
         when /Conditional/
+          # FIXME correctly handle conditionals
+          false
+        when / if /i
           # FIXME correctly handle conditionals
           false
         when /No/
@@ -21,50 +25,43 @@ class CloudformationMapper::AwsDocsResource < CloudformationMapper::Resource
         when nil
           nil
         else
-          byebug
-          'undefined'
+          raise "Unknown 'Require' string '#{val}'"
         end
       end
       alias_method_chain :required, :translate_html
 
       def type val = nil
-        super case val.present? ? val.text.gsub(/\s+/,' ') : val
-        when /A list of Auto Scaling MetricsCollection/
-          'List<AutoScalingMetricsCollection>'
-        when /List of Auto Scaling Tags/
-          'List<AutoScalingTags>'
-        when /NotificationConfiguration/
-          'NotificationConfiguration'
-        when /A list of strings/
-          'List<String>'
-        when /String/
-          'String'
-        when /Integer/
-          'Integer'
+        super translate_type val.present? ? val.text.gsub(/\s+/,' ') : nil
+      end
+
+      def translate_type val
+        case val
+        when /: +(.*)/
+          translate_type $1
+        when /^(?:A )?list of (.+)$/i
+          "List<#{translate_type $1}>"
+        when /^(.+) list$/i
+          "List<#{translate_type $1}>"
+        when /([\w\s]+).?/
+          $1.strip.singularize.camelize
         when nil
           nil
         else
-          byebug
-          'undefined'
+          raise "Unknown 'Type' string '#{val}'"
         end
       end
 
       get_set_value :UpdateRequires
       def update_requires_with_translate_html val = nil
-        update_requires_without_translate_html case val.present? ? val.text : val
-        when /No interruption/
-          'No interruption'
-        when /Conditional/
+        update_requires_without_translate_html case val.present? ? val.text : nil
+        when /: +(.+)/
+          $1.gsub(/\s+/, ' ')
+        when ':'
           'Conditional'
-        when /Some interruptions/
-          'Some interruptions'
-        when /Replacement/
-          'Replacement'
         when nil
           nil
         else
-          byebug
-          'undefined'
+          raise "Unknown 'Update requires' string '#{val}'"
         end
       end
       alias_method_chain :update_requires, :translate_html
@@ -95,18 +92,32 @@ class CloudformationMapper::AwsDocsResource < CloudformationMapper::Resource
           open resource_url do |resource_io|
             resource_doc = Nokogiri::HTML resource_io
 
-            resource_doc.xpath("//div[contains(@class, 'variablelist')]/dl/dt").collect do |node|
+            resource_doc.xpath(
+              "
+              //div[
+                contains(@class, 'section') and
+                ./div[
+                  contains(@class, 'titlepage') and
+                  contains(., 'Properties')
+                ]
+              ]/
+              div[
+                contains(@class, 'variablelist')
+              ]/
+              dl/
+              dt
+              "
+            ).collect do |node|
               description_doc = node.xpath("following-sibling::dd[1]")
 
               properties.parameter CloudformationMapper::AwsDocsResource::Parameter do |param|
-                param.name node.xpath("./span[contains(@class, 'term')][1]").first.content # property_key
-                #param.description description_doc.xpath("./p[1]").first.to_s
+                param.name node.xpath("./span[contains(@class, 'term')][1]").first.content.strip
+                param.description description_doc.xpath("./p[1]").first.text.strip
 
                 puts "\tProperty #{param.name}\n\t\tdescription: '#{param.description}'"
 
                 #:required   :type   :update_requires
                 ['Required', 'Type', 'Update requires'].each do |label|
-                #['Type'].each do |label|
                   key = label.gsub(/\s+/,'_').downcase
                   param.send key, description_doc.xpath("./p/span[./em[contains(text(), '#{label}')]]/following-sibling::* | ./p/span[./em[contains(text(), '#{label}')]]/following-sibling::text()")
                   puts "\t\t#{key}: '#{param.send key}'"

@@ -17,6 +17,7 @@ end
 
 class CloudformationMapper::Parameter::CommaDelimitedList < CloudformationMapper::Parameter::String
   register_type 'CommaDelimitedList'
+  register_type 'List<String>'
 
   def self.mapper
     CloudformationMapper::Parameter::CommaDelimitedListMapper.include super

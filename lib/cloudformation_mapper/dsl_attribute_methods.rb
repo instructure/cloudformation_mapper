@@ -1,6 +1,7 @@
 require 'active_support/concern'
 require 'active_support/inflector'
 require 'active_support/core_ext/object/duplicable'
+require 'active_support/core_ext/object/deep_dup'
 
 require 'cloudformation_mapper'
 
@@ -10,10 +11,14 @@ module CloudformationMapper::DslAttributeMethods
   delegate :[], :[]=, :keys, :has_key?, :each, to: :attributes
   def attributes
     @attributes ||= if ancestors[1].respond_to? :attributes
-                      ancestors[1].attributes.clone
+                      ancestors[1].attributes.deep_dup
                     else
                       {}
                     end
+  end
+
+  def initialize_copy source
+    @attributes = source.attributes.deep_dup
   end
 
   def item mapper_class = default_mapper, &block

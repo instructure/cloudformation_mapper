@@ -34,7 +34,7 @@ class CloudformationMapper::Mapper
     class DuplicateTypeError < StandardError; end
     def register_type type, params = {}
       if CloudformationMapper::Mapper::TYPES.key? type
-        raise DuplicateTypeError, "Duplicate type #{type}"
+        warn "Duplicate type #{type}"
       end
 
       CloudformationMapper::Mapper::TYPES[type] = self

@@ -23,7 +23,7 @@ namespace :aws_docs do
         resource_url = URI.join(DOC_ROOT, resource_href).to_s
 
         doc_template = CloudformationMapper::AwsDocsResource.load(resource_url) do |template|
-          template.name "#{RESOURCE_NAMESPACE}::#{resource_href.gsub(/.html/, '').classify}"
+          template.name "#{RESOURCE_NAMESPACE}::#{resource_href.gsub(/.html/, '').gsub(/-/, '_').classify}"
           template.register_type node.content
         end
 

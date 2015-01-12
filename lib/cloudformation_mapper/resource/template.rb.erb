@@ -1,21 +1,21 @@
 require 'cloudformation_mapper/resource'
 
-class CloudformationMapper::Resource::<%= name %> < CloudformationMapper::Resource
+class <%= name %> < CloudformationMapper::Resource
   register_type '<%= template_type %>'
 
   type 'Template'
 
-  <% parameters.each do |name, param| %>
+<% parameters.each do |name, param| %>
   parameter do
     type '<%= param.type %>'
     name :<%= name %>
 
-    <% param.parameters.each do |name, sub_param| %>
+<% param.parameters.each do |name, sub_param| %>
     parameter do
       type '<%= sub_param.type %>'
       name :<%= name %>
     end
-    <% end %>
+<% end %>
   end
-  <% end %>
+<% end %>
 end

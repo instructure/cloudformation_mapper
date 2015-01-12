@@ -443,7 +443,7 @@ RSpec.describe CloudformationMapper::Directory do
               "Type": "AWS::RDS::DBInstance",
               "Properties": {
                 "AllocatedStorage": 5,
-                "DbInstanceClass": "db.m1.small",
+                "DBInstanceClass": "db.m1.small",
                 "Engine": "postgres",
                 "MasterUsername": {
                   "Ref": "DBUserName"
@@ -456,7 +456,7 @@ RSpec.describe CloudformationMapper::Directory do
                     "Ref": "SecurityGroup"
                   }
                 ],
-                "DbSubnetGroupName": {
+                "DBSubnetGroupName": {
                   "Ref": "DBSubnetGroup"
                 }
               },
