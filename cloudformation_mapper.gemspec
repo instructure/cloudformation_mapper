@@ -17,7 +17,7 @@ Gem::Specification.new do |spec|
   spec.test_files    = spec.files.grep(%r{^(test|spec|features)/})
   spec.require_paths = ["lib"]
 
-  spec.add_dependency "aws-sdk", "~> 2.0.10.pre"
+  spec.add_dependency "aws-sdk", "~> 2.0.18.pre"
   spec.add_dependency "activesupport", "~> 4.1"
   spec.add_dependency "highline", "~> 1.6"
   spec.add_dependency "cloudformation-ruby-dsl"
